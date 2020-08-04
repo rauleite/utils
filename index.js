@@ -1,69 +1,35 @@
-/* eslint-disable no-console */
-import { isDev } from '.';
+export const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-export const TURN_OFF = false;
-// export const CLEAR_LOCALSTORAGE = true;
-const prefix = {
-  INFO: 'INFO',
-  ERROR: 'ERROR',
-  TIME: 'TIME',
-};
+export const isServer = () => typeof window === 'undefined';
+export const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
-const off = (!isDev || TURN_OFF);
-// const postLog
-
-const withGroup = ({
-  baseTime, toRunCb, additional, groupLabel,
+export const loadScript = async ({
+  src, integrity, instanceTest, async = true, defer = false, crossOrigin = 'anonymous',
 }) => {
-  console.group(groupLabel);
-  if (additional) {
-    additional();
-  }
-  const timeLabel = groupLabel !== prefix.TIME ? prefix.TIME : ':';
-  const result = baseTime({ toRunCb, timeLabel });
-  console.groupEnd(groupLabel);
-  return result;
+  if (isServer()) return;
+  return new Promise((resolve) => {
+    // Mas eh bom colocar um test na chamada de loadScript() – ex.: !window.fabric
+    if (instanceTest) {
+      console.warn('obj já carregado');
+      return resolve();
+    }
+    const tag = document.createElement('script');
+    tag.src = src;
+    if (integrity) {
+      tag.integrity = integrity;
+    }
+    tag.async = async;
+    tag.defer = defer;
+    tag.crossOrigin = crossOrigin;
+    document.body.appendChild(tag);
+    tag.onload = () => resolve();
+  });
 };
 
-const log = {};
-
-log.info = (...args) => {
-  if (off) return;
-  console.info(prefix.INFO, ...args);
-};
-log.error = (...args) => {
-  if (off) return;
-  console.error(prefix.ERROR, ...args);
-};
-
-/**
- * Run code and mensure it
- * @param {object} {toRun, label, info}
- * @returns Running toRun() function
- */
-log.time = ({ toRun, label = prefix.TIME, info }) => {
-  if (off) {
-    return toRun();
-  }
-
-  const baseTime = ({ toRunCb, timeLabel = prefix.TIME }) => {
-    console.time(timeLabel);
-    const result = toRunCb();
-    console.timeEnd(timeLabel);
-    return result;
+export const milliToPixel = ({ width, height }) => {
+  const pixel = 3.7795275591;
+  return {
+    width: width * pixel,
+    height: height * pixel,
   };
-
-  // Com grupo
-  if (info) {
-    const logInfo = () => log.info(...info);
-    return withGroup({
-      baseTime,
-      toRunCb: toRun,
-      additional: logInfo,
-      groupLabel: label,
-    });
-  }
-  return baseTime({ toRunCb: toRun, label });
 };
-
-export default log;
