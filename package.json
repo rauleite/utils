@@ -1,8 +1,7 @@
 {
-  "name": "@rauljs/utils",
+  "name": "@luar/utils",
   "version": "0.0.1",
   "main": "index.js",
   "author": "Raul Leite",
-  "license": "MIT",
-  "gitHead": "ddcb10242daa249342afcf0c43953b6e0d68247a"
+  "license": "MIT"
 }
