@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { isDev } from '.';
+const { isDev } = require('..');
 
 export const TURN_OFF = false;
 // export const CLEAR_LOCALSTORAGE = true;
